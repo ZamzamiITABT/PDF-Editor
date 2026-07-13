@@ -33,10 +33,10 @@ Copy-Item 'src-tauri\target\release\bundle\nsis\ABT PDF Tools_1.0.0_x64-setup.ex
 
 ## Verified artifacts
 
-| Artifact | Bytes | SHA-256 |
-| --- | ---: | --- |
-| `frontend/editor/src-tauri/target/release/ABT PDF Tools.exe` | 70,494,208 | `221493F99349A3C414B391FD6004AD4B17483EDA2A5E69324AA8E3E6E3200482` |
-| `frontend/editor/src-tauri/target/release/bundle/nsis/ABT-PDF-Tools-Setup-1.0.0.exe` | 260,231,276 | `F06F1EE429BF1102C0C21ACB92F074EF7E4501C52DA4A53CDBAD29B23AE33A44` |
+| Artifact                                                                             |       Bytes | SHA-256                                                            |
+| ------------------------------------------------------------------------------------ | ----------: | ------------------------------------------------------------------ |
+| `frontend/editor/src-tauri/target/release/ABT PDF Tools.exe`                         |  70,494,208 | `03535F23BAC4237A7DA88456A6392C678A9C167B5DD4225670E9B018024D5FFA` |
+| `frontend/editor/src-tauri/target/release/bundle/nsis/ABT-PDF-Tools-Setup-1.0.0.exe` | 260,237,725 | `30AC385AC637502FA674079091D346CB397E921F133981CCADF299ABCBAC5575` |
 
 Both files are unsigned. The application version resource reports product/file description `ABT PDF Tools`, company `ABT Group`, and version `1.0.0`. The NSIS bootstrap reports product `ABT PDF Tools` and version `1.0.0`; Windows Apps & Features records publisher `ABT Group`. Interactive installation can display an unknown-publisher or SmartScreen warning until ABT code signing is configured.
 

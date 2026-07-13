@@ -78,3 +78,16 @@ The first branded package panicked before launch because a registered Tauri upda
 ## Signing warning
 
 The executable and installer have Authenticode status `NotSigned`. Interactive installs may show an unknown-publisher/SmartScreen warning. Do not distribute to employees until ABT signing and the official visual assets are supplied and validated.
+
+## Production-polish revalidation
+
+The placeholder narrow-layout fix and explicit NSIS `currentUser` scope were rebuilt and installed on 13 July 2026. The generated NSIS script contained `INSTALLMODE "currentUser"` and `RequestExecutionLevel user`.
+
+- Tauri PID: `26460`
+- Java PID: `32048`
+- Listener: `127.0.0.1:22210`
+- LAN probe: `10.8.4.62:22210` was not reachable
+- Normal close: both processes exited
+- Silent uninstall: exit code 0; install directory, shortcuts, and HKCU uninstall record removed
+
+No Java launcher, authentication, CSRF, telemetry, updater, or backend-bind setting changed during this polish pass.

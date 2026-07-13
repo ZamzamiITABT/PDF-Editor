@@ -6,16 +6,16 @@ This plan prepares the existing NSIS build for a limited test-user pilot. It doe
 
 Use version `1.0.0` for the pilot. It already produces the required Windows version metadata and distribution filename without introducing prerelease-version ambiguity in Windows detection.
 
-| Setting | Pilot value | Current source |
-| --- | --- | --- |
-| Product | `ABT PDF Tools` | `frontend/editor/src-tauri/tauri.conf.json` |
-| Publisher | `ABT Group` | `frontend/editor/src-tauri/tauri.conf.json` |
-| Version | `1.0.0` | `frontend/editor/src-tauri/tauri.conf.json` |
-| Installer | `ABT-PDF-Tools-Setup-1.0.0.exe` | Post-build copy documented in `docs/ABT-DESKTOP-BUILD.md` |
-| Automatic updater | Disabled; no endpoint | `createUpdaterArtifacts=false`, `plugins.updater.endpoints=[]`, desktop update mode disabled |
-| Cloud promotion and login | Hidden; desktop SaaS URLs blank | Desktop layer overrides and `frontend/editor/.env.desktop` |
-| Telemetry | Disabled | Backend JVM options disable analytics, PostHog, and Scarf |
-| Backend exposure | Loopback only | `-Dserver.address=127.0.0.1` in the actual desktop Java launcher |
+| Setting                   | Pilot value                     | Current source                                                                               |
+| ------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------- |
+| Product                   | `ABT PDF Tools`                 | `frontend/editor/src-tauri/tauri.conf.json`                                                  |
+| Publisher                 | `ABT Group`                     | `frontend/editor/src-tauri/tauri.conf.json`                                                  |
+| Version                   | `1.0.0`                         | `frontend/editor/src-tauri/tauri.conf.json`                                                  |
+| Installer                 | `ABT-PDF-Tools-Setup-1.0.0.exe` | Post-build copy documented in `docs/ABT-DESKTOP-BUILD.md`                                    |
+| Automatic updater         | Disabled; no endpoint           | `createUpdaterArtifacts=false`, `plugins.updater.endpoints=[]`, desktop update mode disabled |
+| Cloud promotion and login | Hidden; desktop SaaS URLs blank | Desktop layer overrides and `frontend/editor/.env.desktop`                                   |
+| Telemetry                 | Disabled                        | Backend JVM options disable analytics, PostHog, and Scarf                                    |
+| Backend exposure          | Loopback only                   | `-Dserver.address=127.0.0.1` in the actual desktop Java launcher                             |
 
 Do not alter authentication, CSRF, OCR, or the loopback argument as part of visual branding.
 
@@ -25,26 +25,28 @@ No official file has been substituted yet. Supply original, approved artwork wit
 
 ### Required starting files
 
-| File to provide | Format and dimensions | Current placeholder or target |
-| --- | --- | --- |
-| `abt-logo.svg` | SVG with transparent canvas, tight `viewBox`, embedded or outlined fonts, no linked resources. Preserve the official aspect ratio; a 1024-unit-wide viewBox is preferred. | `frontend/editor/src/desktop/assets/brand/abt-placeholder/abt-logo.svg` |
-| `abt-logo-transparent.png` | Transparent PNG, sRGB, at least 1024 px on the longest edge. Do not add padding beyond the official clear-space rule. | No current file; reserved target: `frontend/editor/src/desktop/assets/brand/abt-placeholder/abt-logo-transparent.png` |
-| `abt-app-icon-1024.png` | Exactly 1024x1024 PNG, sRGB, square canvas, approved safe area and corner treatment. Transparency is allowed; do not pre-round the corners unless the ABT standard requires it. | Replaces the source represented by `frontend/editor/src-tauri/icons/abt-placeholder/icon.png`; Tauri regenerates all derived sizes from it. |
-| `abt-app-icon.ico` | Windows ICO containing 16, 24, 32, 48, 64, 128, and 256 px images at 32-bit color with alpha. | `frontend/editor/src-tauri/icons/abt-placeholder/icon.ico`; currently used for both application and installer icon. |
+| File to provide            | Format and dimensions                                                                                                                                                           | Current placeholder or target                                                                                                               |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `abt-logo.svg`             | SVG with transparent canvas, tight `viewBox`, embedded or outlined fonts, no linked resources. Preserve the official aspect ratio; a 1024-unit-wide viewBox is preferred.       | `frontend/editor/src/desktop/assets/brand/abt-placeholder/abt-logo.svg`                                                                     |
+| `abt-logo-transparent.png` | Transparent PNG, sRGB, at least 1024 px on the longest edge. Do not add padding beyond the official clear-space rule.                                                           | No current file; reserved target: `frontend/editor/src/desktop/assets/brand/abt-placeholder/abt-logo-transparent.png`                       |
+| `abt-app-icon-1024.png`    | Exactly 1024x1024 PNG, sRGB, square canvas, approved safe area and corner treatment. Transparency is allowed; do not pre-round the corners unless the ABT standard requires it. | Replaces the source represented by `frontend/editor/src-tauri/icons/abt-placeholder/icon.png`; Tauri regenerates all derived sizes from it. |
+| `abt-app-icon.ico`         | Windows ICO containing 16, 24, 32, 48, 64, 128, and 256 px images at 32-bit color with alpha.                                                                                   | `frontend/editor/src-tauri/icons/abt-placeholder/icon.ico`; currently used for both application and installer icon.                         |
 
 ### Required theme variants
 
 Provide approved exports for the following, or provide written approval and exact color values allowing them to be derived from the master vector:
 
-| Official export | Format and dimensions | Current path |
-| --- | --- | --- |
-| `abt-wordmark-black.svg` | SVG, transparent, same aspect ratio/viewBox as the other wordmarks; approved for light backgrounds. | `frontend/editor/src/desktop/assets/brand/abt-placeholder/abt-wordmark-black.svg` |
-| `abt-wordmark-grey.svg` | SVG, transparent, same geometry; approved muted treatment for light backgrounds. | `frontend/editor/src/desktop/assets/brand/abt-placeholder/abt-wordmark-grey.svg` |
-| `abt-wordmark-white.svg` | SVG, transparent, same geometry; approved for dark backgrounds. | `frontend/editor/src/desktop/assets/brand/abt-placeholder/abt-wordmark-white.svg` |
-| `abt-mark-light.svg` | No-text logo mark SVG for light backgrounds, square viewBox preferred. | The current desktop folder is expected to contain `StirlingPDFLogoNoTextLight.svg`, but that placeholder file is absent. The official pass will replace this legacy filename and update the desktop hook. |
-| `abt-mark-dark.svg` | No-text logo mark SVG for dark backgrounds, square viewBox preferred. | The current desktop folder is expected to contain `StirlingPDFLogoNoTextDark.svg`, but that placeholder file is absent. The official pass will replace this legacy filename and update the desktop hook. |
+| Official export          | Format and dimensions                                                                               | Current path                                                                                                                                     |
+| ------------------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `abt-wordmark-black.svg` | SVG, transparent, same aspect ratio/viewBox as the other wordmarks; approved for light backgrounds. | `frontend/editor/src/desktop/assets/brand/abt-placeholder/abt-wordmark-black.svg`                                                                |
+| `abt-wordmark-grey.svg`  | SVG, transparent, same geometry; approved muted treatment for light backgrounds.                    | `frontend/editor/src/desktop/assets/brand/abt-placeholder/abt-wordmark-grey.svg`                                                                 |
+| `abt-wordmark-white.svg` | SVG, transparent, same geometry; approved for dark backgrounds.                                     | `frontend/editor/src/desktop/assets/brand/abt-placeholder/abt-wordmark-white.svg`                                                                |
+| `abt-mark-light.svg`     | No-text logo mark SVG for light backgrounds, square viewBox preferred.                              | No official file yet. The desktop hook currently maps light mode to the existing `abt-logo.svg` placeholder instead of the core legacy filename. |
+| `abt-mark-dark.svg`      | No-text logo mark SVG for dark backgrounds, square viewBox preferred.                               | No official file yet. The desktop hook currently maps dark mode to the existing `abt-logo.svg` placeholder instead of the core legacy filename.  |
 
-The missing no-text placeholder files are a visual-review blocker for mobile/narrow home layouts; they are not permission to invent an ABT mark.
+Until the official no-text variants arrive, the desktop-specific `useLogoPath` override deliberately uses the existing neutral `abt-logo.svg` placeholder in both themes. This prevents broken images in mobile/narrow layouts without inventing or recoloring a mark.
+
+The external intake directory is `C:\Users\OmarZamzami\Documents\Codex\PDF Project\Branding`. It remains empty until real artwork is supplied; empty files or copied placeholders must not be mistaken for approved assets.
 
 ### Loading and installer artwork
 
@@ -115,16 +117,16 @@ The generated NSIS script confirms:
 
 Recommended Intune Win32 app settings:
 
-| Setting | Recommendation |
-| --- | --- |
-| Install behavior | **User** context |
-| Install command | `ABT-PDF-Tools-Setup-1.0.0.exe /S` |
-| Uninstall command | `cmd.exe /c ""%LOCALAPPDATA%\ABT PDF Tools\uninstall.exe" /S"` |
-| Detection type | Registry, evaluated in the installing user's context |
-| Key path | `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\ABT PDF Tools` |
-| Detection value | `DisplayVersion` string equals `1.0.0` |
+| Setting               | Recommendation                                                                                             |
+| --------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Install behavior      | **User** context                                                                                           |
+| Install command       | `ABT-PDF-Tools-Setup-1.0.0.exe /S`                                                                         |
+| Uninstall command     | `cmd.exe /c ""%LOCALAPPDATA%\ABT PDF Tools\uninstall.exe" /S"`                                             |
+| Detection type        | Registry, evaluated in the installing user's context                                                       |
+| Key path              | `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\ABT PDF Tools`                      |
+| Detection value       | `DisplayVersion` string equals `1.0.0`                                                                     |
 | Additional validation | `DisplayName` equals `ABT PDF Tools`; optional file check `%LOCALAPPDATA%\ABT PDF Tools\ABT PDF Tools.exe` |
-| Architecture | 64-bit application |
+| Architecture          | 64-bit application                                                                                         |
 
 Return-code handling:
 
@@ -136,8 +138,8 @@ Do not use an HKLM detection rule for this build. Do not deploy in System contex
 
 ## Known limitations and blockers
 
-- Official ABT logo, theme variants, square application icon, and ICO have not been supplied.
-- The narrow-layout no-text logo paths currently have no placeholder files; official mark variants are required for the final visual pass.
+- Official ABT artwork is deferred to a separate visual milestone. The existing clearly identified placeholders are accepted for pilot preparation.
+- The official no-text light/dark marks remain pending; narrow layouts intentionally use the neutral placeholder in both themes.
 - Artifacts are unsigned, so SmartScreen/unknown-publisher prompts remain.
 - OCR returns HTTP 403 because the endpoint is disabled in the unchanged desktop bundle. Do not enable it by weakening security.
 - The package is per-user. A separate configuration/build/validation cycle is required before a per-machine or MSI deployment.
