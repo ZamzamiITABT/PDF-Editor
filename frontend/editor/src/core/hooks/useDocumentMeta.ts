@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface MetaOptions {
+  siteName?: string;
   title?: string;
   description?: string;
   ogTitle?: string;
@@ -75,7 +76,7 @@ export const useDocumentMeta = (meta: MetaOptions) => {
     }
 
     // Update OpenGraph tags
-    updateOrCreateProperty("og:site_name", "Stirling PDF");
+    updateOrCreateProperty("og:site_name", meta.siteName || document.title);
     updateOrCreateProperty("og:locale", i18n.language.replace("-", "_"));
 
     if (meta.ogTitle) {
@@ -117,6 +118,7 @@ export const useDocumentMeta = (meta: MetaOptions) => {
       });
     };
   }, [
+    meta.siteName,
     meta.title,
     meta.description,
     meta.ogTitle,

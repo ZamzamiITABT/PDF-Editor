@@ -332,8 +332,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     >
       <ToolActionsContext.Provider
         value={{
-          onEndpointUnavailableClick: () =>
-            window.dispatchEvent(new CustomEvent(OPEN_SIGN_IN_EVENT)),
+          onEndpointUnavailableClick: () => undefined,
         }}
       >
         <SaaSTeamProvider key={appKey}>

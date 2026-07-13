@@ -19,7 +19,10 @@ const absolute = (urlPath, ogBase) => (ogBase ? ogBase + urlPath : urlPath);
  * @param {{image:string,title:string,description:string}} entry
  * @param {{ogBase?:string, pageUrlPath?:string|null}} opts
  */
-export function buildOgTags(entry, { ogBase = "", pageUrlPath = null } = {}) {
+export function buildOgTags(
+  entry,
+  { ogBase = "", pageUrlPath = null, siteName = "Stirling PDF" } = {},
+) {
   const title = escapeHtml(entry.title);
   const description = escapeHtml(entry.description);
   const imageUrl = absolute(entry.image, ogBase);
@@ -30,7 +33,7 @@ export function buildOgTags(entry, { ogBase = "", pageUrlPath = null } = {}) {
   const lines = [
     "<!-- og:start -->",
     '<meta property="og:type" content="website" />',
-    '<meta property="og:site_name" content="Stirling PDF" />',
+    `<meta property="og:site_name" content="${escapeHtml(siteName)}" />`,
     `<meta property="og:title" content="${title}" />`,
     `<meta property="og:description" content="${description}" />`,
     pageUrl ? `<meta property="og:url" content="${pageUrl}" />` : null,
@@ -84,6 +87,7 @@ export async function prerenderOg({
   manifest,
   ogBase = "",
   baseHref = "/",
+  siteName = "Stirling PDF",
 }) {
   const template = await fs.readFile(path.join(distDir, "index.html"), "utf8");
 
@@ -92,6 +96,7 @@ export async function prerenderOg({
     injectOg(template, manifest.default, {
       ogBase,
       pageUrlPath: ogBase ? "/" : null,
+      siteName,
     }),
   );
 
@@ -105,6 +110,7 @@ export async function prerenderOg({
     let html = injectOg(template, entry, {
       ogBase,
       pageUrlPath: ogBase ? routePath : null,
+      siteName,
     });
     const nested = segments.length > 1;
     if (nested)

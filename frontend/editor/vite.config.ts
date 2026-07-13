@@ -88,7 +88,13 @@ function compressStaticCopyPlugin(): PluginOption {
 // Pages). Otherwise URLs stay root-relative, which still resolves against whatever
 // origin serves the page (correct for self-hosted Docker). Logic lives in
 // scripts/og-prerender.mjs so it can be unit-tested without a full build.
-function prerenderOgPlugin(): PluginOption {
+function prerenderOgPlugin({
+  siteName,
+  homeDescription,
+}: {
+  siteName: string;
+  homeDescription: string;
+}): PluginOption {
   return {
     name: "prerender-og",
     apply: "build" as const,
@@ -117,8 +123,19 @@ function prerenderOgPlugin(): PluginOption {
         );
         return;
       }
+      manifest.default = {
+        ...manifest.default,
+        title: siteName,
+        description: homeDescription,
+      };
       const distDir = path.resolve(__dirname, "dist");
-      const count = await prerenderOg({ distDir, manifest, ogBase, baseHref });
+      const count = await prerenderOg({
+        distDir,
+        manifest,
+        ogBase,
+        baseHref,
+        siteName,
+      });
       console.log(
         `[prerender-og] wrote ${count} prerendered route pages` +
           (ogBase
@@ -327,10 +344,21 @@ export default defineConfig(async ({ mode, command }) => {
             src: "src/core/assets/brand/modern-logo/*",
             dest: "modern-logo",
           },
+          {
+            src: "src/desktop/assets/brand/abt-placeholder/*",
+            dest: "abt-placeholder",
+          },
+          {
+            src: "src-tauri/icons/abt-placeholder/icon.{ico,png}",
+            dest: "abt-placeholder",
+          },
         ],
       }),
       compressStaticCopyPlugin(),
-      prerenderOgPlugin(),
+      prerenderOgPlugin({
+        siteName: env.VITE_APP_TITLE,
+        homeDescription: env.VITE_APP_DESCRIPTION,
+      }),
     ],
     server: {
       host: true,

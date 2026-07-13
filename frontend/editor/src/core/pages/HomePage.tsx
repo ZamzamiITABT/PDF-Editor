@@ -293,8 +293,9 @@ export default function HomePage() {
   const baseUrl = useBaseUrl();
 
   // Update document meta when tool changes
-  const appName = config?.appNameNavbar || "Stirling PDF";
+  const appName = config?.appNameNavbar || import.meta.env.VITE_APP_TITLE;
   useDocumentMeta({
+    siteName: appName,
     title: selectedTool ? `${selectedTool.name} - ${appName}` : appName,
     description:
       selectedTool?.description ||

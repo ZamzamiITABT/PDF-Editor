@@ -867,7 +867,7 @@ const FileSidebar = forwardRef<HTMLDivElement, FileSidebarProps>(
               </span>
               {!collapsed && (
                 <Wordmark
-                  alt="Stirling PDF"
+                  alt={config?.appNameNavbar || import.meta.env.VITE_APP_TITLE}
                   className="file-sidebar-brand-text sidebar-content-fade"
                 />
               )}

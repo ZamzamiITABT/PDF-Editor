@@ -1,0 +1,15 @@
+{
+  "short_name": "ABT PDF Tools",
+  "name": "ABT PDF Tools",
+  "icons": [
+    {
+      "src": "abt-placeholder/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#123B63",
+  "background_color": "#FFFFFF"
+}
