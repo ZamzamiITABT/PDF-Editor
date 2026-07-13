@@ -1,133 +1,80 @@
-# ABT Desktop Installer Testing
+# ABT desktop installer testing
 
-This document records the repeatable Windows validation used before ABT branding. Paths and product names still show the unchanged upstream branding.
-
-## Build
-
-Run from `frontend/editor` with the repository's verified Node 22, Rust, Java 25, and Visual Studio environment:
-
-```powershell
-npx.cmd tauri build --bundles nsis --config .tools/tauri-nsis-config.json
-```
-
-The temporary config disables only the duplicate frontend `beforeBuildCommand`; the already-built production frontend, bundled JAR, JRE, Rust application, and NSIS bundle remain unchanged.
+Validated on Windows on 13 July 2026 using `ABT-PDF-Tools-Setup-1.0.0.exe`.
 
 ## Install and launch
 
 ```powershell
-& 'frontend\editor\src-tauri\target\release\bundle\nsis\Stirling PDF_2.14.1_x64-setup.exe' /S
-Start-Process "$env:LOCALAPPDATA\Stirling PDF\Stirling-PDF.exe"
+& 'frontend\editor\src-tauri\target\release\bundle\nsis\ABT-PDF-Tools-Setup-1.0.0.exe' /S
+Start-Process "$env:LOCALAPPDATA\ABT PDF Tools\ABT PDF Tools.exe"
 ```
 
-The installer and executable are unsigned. Windows can display an unknown-publisher/SmartScreen warning for an interactive installation.
+Silent installation returned exit code 0. Windows created:
 
-## Process and bind-address verification
+- `%LOCALAPPDATA%\ABT PDF Tools\ABT PDF Tools.exe`
+- `%APPDATA%\Microsoft\Windows\Start Menu\Programs\ABT PDF Tools.lnk`
+- `%USERPROFILE%\Desktop\ABT PDF Tools.lnk`
+- `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\ABT PDF Tools`
 
-Find the Tauri and child Java process:
+The Apps & Features record reported display name `ABT PDF Tools`, version `1.0.0`, publisher `ABT Group`, and install location `%LOCALAPPDATA%\ABT PDF Tools`. The visible window title was `ABT PDF Tools`.
 
-```powershell
-Get-CimInstance Win32_Process |
-  Where-Object { $_.Name -in 'Stirling-PDF.exe','java.exe' } |
-  Select-Object ProcessId, ParentProcessId, Name, CommandLine
-```
+## Backend and network evidence
 
-The Java command must contain:
+The successful run used Tauri PID `10864`, Java PID `37824`, and random port `11226`. The actual child command was:
 
 ```text
--Dserver.port=0 -Dserver.address=127.0.0.1
+"C:\Users\OmarZamzami\AppData\Local\ABT PDF Tools\runtime\jre\bin\java.exe" -Xmx2g -DBROWSER_OPEN=false -DSTIRLING_PDF_TAURI_MODE=true -Dlogging.file.path=C:\Users\OmarZamzami\AppData\Roaming\Stirling-PDF\logs -Dlogging.file.name=stirling-pdf.log -Dserver.port=0 -Dserver.address=127.0.0.1 "-Dui.appNameNavbar=ABT PDF Tools" -Dsystem.enableAnalytics=false -Dsystem.enablePosthog=false -Dsystem.enableScarf=false -Dsystem.showUpdate=false -Dserver.forward-headers-strategy=none -Dsecurity.enableLogin=false -Dsecurity.csrfDisabled=true -jar "C:\Users\OmarZamzami\AppData\Local\ABT PDF Tools\libs\stirling-pdf-2.14.1.jar"
 ```
 
-Record listeners using both Windows views:
+Evidence commands:
 
 ```powershell
-Get-NetTCPConnection -State Listen -OwningProcess <JAVA_PID>
-netstat -ano | Select-String '<JAVA_PID>|:<RANDOM_PORT>'
+Get-CimInstance Win32_Process -Filter "Name='java.exe'" |
+  Select-Object ProcessId, ParentProcessId, ExecutablePath, CommandLine
+Get-NetTCPConnection -State Listen -OwningProcess 37824
+Invoke-RestMethod http://127.0.0.1:11226/api/v1/config/app-config
 ```
 
-Pass criteria:
-
-- Listener is `127.0.0.1:<RANDOM_PORT>`.
-- No listener is `0.0.0.0:<RANDOM_PORT>`.
-- No listener uses the machine's LAN address.
-- A TCP connection to `<LAN_IP>:<RANDOM_PORT>` fails.
-- Firewall behavior is recorded; loopback isolation must not depend on a firewall allow/deny rule.
-
-Validated result on 13 July 2026:
+Observed listener:
 
 ```text
-Tauri PID: 42404
-Java PID: 17920
-TCP 127.0.0.1:13907 0.0.0.0:0 LISTENING 17920
-LAN probe 172.29.176.1:13907: False
-Matching Windows Firewall application filters: 0
+LocalAddress LocalPort OwningProcess State
+127.0.0.1        11226         37824 Listen
 ```
 
-## Functional test requests
+- Loopback config request: HTTP 200.
+- Runtime config: `appNameNavbar=ABT PDF Tools`, `enableAnalytics=false`, `enablePosthog=false`, `enableScarf=false`, `shouldShowUpdate=false`.
+- No `0.0.0.0`, `[::]`, or LAN-interface listener existed.
+- TCP probe to Wi-Fi address `10.8.4.62:11226`: failed as required.
+- Matching ABT Windows Firewall rules: 0. Isolation came from the bind address, not a firewall rule.
 
-All calls use the random loopback URL discovered above. Use disposable PDFs without sensitive data.
+## Functional status
+
+The loopback change and branding do not alter PDF endpoints. The unchanged installed bundle previously passed merge, split, compress, password protection, watermark, save, Arabic filenames, spaces, and OneDrive paths. OCR returns HTTP 403 (`This endpoint is disabled`) because the desktop bundle lacks/enforces disabled OCR dependencies; this remains a documented limitation and was not bypassed by weakening security.
+
+## Close and uninstall
+
+Normal close:
 
 ```powershell
-curl.exe --fail-with-body --output merged.pdf `
-  --form 'fileInput=@first.pdf;type=application/pdf' `
-  --form 'fileInput=@second.pdf;type=application/pdf' `
-  --form 'sortType=orderProvided' --form 'removeCertSign=false' `
-  --form 'generateToc=false' `
-  http://127.0.0.1:<PORT>/api/v1/general/merge-pdfs
-
-curl.exe --fail-with-body --output split.zip `
-  --form 'fileInput=@merged.pdf;type=application/pdf' `
-  --form 'pageNumbers=1' `
-  http://127.0.0.1:<PORT>/api/v1/general/split-pages
-
-curl.exe --fail-with-body --output compressed.pdf `
-  --form 'fileInput=@Name With Spaces.pdf;type=application/pdf' `
-  --form 'optimizeLevel=2' --form 'grayscale=false' `
-  --form 'lineArt=false' --form 'linearize=false' `
-  http://127.0.0.1:<PORT>/api/v1/misc/compress-pdf
-
-curl.exe --fail-with-body --output protected.pdf `
-  --form 'fileInput=@ملف عربي.pdf;type=application/pdf' `
-  --form 'password=<TEST_PASSWORD>' --form 'ownerPassword=<TEST_OWNER_PASSWORD>' `
-  --form 'keyLength=256' `
-  http://127.0.0.1:<PORT>/api/v1/security/add-password
-
-curl.exe --fail-with-body --output watermarked.pdf `
-  --form 'fileInput=@Name With Spaces.pdf;type=application/pdf' `
-  --form 'watermarkType=text' --form 'watermarkText=ABT TEST' `
-  --form 'fontSize=12' --form 'rotation=0' --form 'opacity=0.5' `
-  --form 'widthSpacer=50' --form 'heightSpacer=50' `
-  --form 'alphabet=roman' --form 'customColor=#d3d3d3' `
-  --form 'convertPDFToImage=false' `
-  http://127.0.0.1:<PORT>/api/v1/security/add-watermark
+(Get-Process -Id 10864).CloseMainWindow()
+Get-Process -Id 10864,37824 -ErrorAction SilentlyContinue
 ```
 
-Repeat a processing request with input and output under the actual OneDrive directory. Confirm the result exists and has a `%PDF-` header. The 13 July run passed spaces, Arabic filenames, OneDrive input/output, and save behavior. OCR was attempted and returned HTTP 403 with `This endpoint is disabled`; it is not a passing feature in the unchanged desktop bundle.
+`CloseMainWindow()` returned true. Both the Tauri and Java processes exited, and no listening socket remained.
 
-## Close behavior
-
-Close the visible app normally, then confirm the Tauri and Java PIDs are gone:
+Silent uninstall:
 
 ```powershell
-(Get-Process -Id <TAURI_PID>).CloseMainWindow()
-Get-Process -Id <TAURI_PID>,<JAVA_PID> -ErrorAction SilentlyContinue
-netstat -ano | Select-String ':<RANDOM_PORT>'
+& "$env:LOCALAPPDATA\ABT PDF Tools\uninstall.exe" /S
 ```
 
-`TIME_WAIT` entries are normal. A `LISTENING` entry or surviving bundled Java process is a failure.
+Uninstall returned exit code 0 and removed the installation directory, Start Menu shortcut, desktop shortcut, Apps & Features registry entry, processes, and services. `%APPDATA%\Stirling-PDF` remains as the existing upstream-compatible user-data directory; it contains settings/logs/pipeline data and is intentionally not deleted by the uninstaller.
 
-## Silent uninstall and leftovers
+## Runtime regression found during validation
 
-```powershell
-& "$env:LOCALAPPDATA\Stirling PDF\uninstall.exe" /S
-```
+The first branded package panicked before launch because a registered Tauri updater plugin cannot deserialize a missing configuration block. The final configuration retains a valid updater object with `endpoints: []`; update mode is also disabled. The rebuilt installer then completed the full lifecycle above without external updater access.
 
-Verify:
+## Signing warning
 
-```powershell
-Test-Path "$env:LOCALAPPDATA\Stirling PDF"
-Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' |
-  Where-Object DisplayName -Like '*Stirling*'
-Get-Service | Where-Object { $_.Name -Match 'Stirling' -or $_.DisplayName -Match 'Stirling' }
-```
-
-The validated uninstall returned exit code 0, removed the install directory and registry entry, and left no process or service. It retained `%APPDATA%\Stirling-PDF\{configs,customFiles,logs,pipeline}`. Treat those as user data and decide separately whether an ABT uninstaller should offer an explicit data-removal option.
+The executable and installer have Authenticode status `NotSigned`. Interactive installs may show an unknown-publisher/SmartScreen warning. Do not distribute to employees until ABT signing and the official visual assets are supplied and validated.

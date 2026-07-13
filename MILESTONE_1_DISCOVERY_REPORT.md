@@ -145,3 +145,9 @@ The browser automation connection was unavailable because Windows denied access 
 - Preserve all upstream legal, copyright, and third-party notice files while implementing supported branding overrides.
 
 Branding may begin only after this focused security commit is reviewed and pushed. Official ABT logo/icon assets are still pending, so placeholders must document their required paths and dimensions.
+
+## Milestone 2 branding validation
+
+On 13 July 2026, the Tauri desktop flavor was branded through supported configuration and desktop-layer overrides as `ABT PDF Tools` version `1.0.0`, publisher `ABT Group`. The branded NSIS package installed, launched, exposed only `127.0.0.1:11226`, rejected the host LAN address `10.8.4.62:11226`, closed both Tauri and Java processes, and silently uninstalled successfully. Windows integration names (Apps & Features, Start Menu, desktop shortcut, executable, and window) matched the target.
+
+The first installed branding candidate identified a Tauri updater initialization panic caused by a missing plugin configuration. Restoring a valid updater configuration with an empty endpoint list resolved it while keeping updates disabled. OCR continues to return HTTP 403 in the unchanged backend and remains a known non-branding limitation. Official ABT logo/icon files and code signing are still required for the final visual/distribution pass.
