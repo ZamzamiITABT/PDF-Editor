@@ -62,7 +62,8 @@
       "digestAlgorithm": "sha256",
       "timestampUrl": "http://timestamp.digicert.com",
       "nsis": {
-        "installerIcon": "icons/abt-placeholder/icon.ico"
+        "installerIcon": "icons/abt-placeholder/icon.ico",
+        "installMode": "currentUser"
       },
       "wix": {
         "upgradeCode": "3305fba9-7e5e-5c09-bc71-eca0a65f4fee",
