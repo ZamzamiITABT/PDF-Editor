@@ -165,6 +165,23 @@ fn copy_dir_recursive(src: &Path, dest: &Path) -> std::io::Result<()> {
     Ok(())
 }
 
+fn desktop_java_options(log_path_option: &str) -> Vec<&str> {
+    vec![
+        "-Xmx2g",
+        "-DBROWSER_OPEN=false",
+        "-DSTIRLING_PDF_TAURI_MODE=true",
+        log_path_option,
+        "-Dlogging.file.name=stirling-pdf.log",
+        "-Dserver.port=0", // Let OS assign an available port
+        "-Dserver.address=127.0.0.1",
+        // No reverse proxy in front of the local sidecar, so don't trust forwarded headers.
+        // Stops a LAN caller spoofing X-Forwarded-For to defeat the desktop-only signing gate.
+        "-Dserver.forward-headers-strategy=none",
+        "-Dsecurity.enableLogin=false", // Disable login for desktop mode
+        "-Dsecurity.csrfDisabled=true", // Disable CSRF for desktop mode
+    ]
+}
+
 // Create, configure and run the Java command to run Stirling-PDF JAR
 fn run_stirling_pdf_jar(app: &tauri::AppHandle, java_path: &PathBuf, jar_path: &PathBuf) -> Result<(), String> {
     // Get platform-specific application data directory for Tauri mode
@@ -203,19 +220,7 @@ fn run_stirling_pdf_jar(app: &tauri::AppHandle, java_path: &PathBuf, jar_path: &
     // Define all Java options with Tauri-specific paths
     let log_path_option = format!("-Dlogging.file.path={}", log_dir.display());
 
-    let mut java_options = vec![
-        "-Xmx2g",
-        "-DBROWSER_OPEN=false",
-        "-DSTIRLING_PDF_TAURI_MODE=true",
-        &log_path_option,
-        "-Dlogging.file.name=stirling-pdf.log",
-        "-Dserver.port=0",  // Let OS assign an available port
-        // No reverse proxy in front of the local sidecar, so don't trust forwarded headers.
-        // Stops a LAN caller spoofing X-Forwarded-For to defeat the desktop-only signing gate.
-        "-Dserver.forward-headers-strategy=none",
-        "-Dsecurity.enableLogin=false",  // Disable login for desktop mode
-        "-Dsecurity.csrfDisabled=true",  // Disable CSRF for desktop mode
-    ];
+    let mut java_options = desktop_java_options(&log_path_option);
 
     // Enable the login agreement on local desktop installs when it has been provisioned.
     if crate::commands::connection::login_agreement_enabled(app) {
@@ -293,6 +298,18 @@ fn run_stirling_pdf_jar(app: &tauri::AppHandle, java_path: &PathBuf, jar_path: &
     monitor_backend_output(rx);
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::desktop_java_options;
+
+    #[test]
+    fn desktop_backend_binds_to_ipv4_loopback() {
+        let options = desktop_java_options("-Dlogging.file.path=test");
+
+        assert!(options.contains(&"-Dserver.address=127.0.0.1"));
+    }
 }
 
 // Monitor backend output in a separate task
