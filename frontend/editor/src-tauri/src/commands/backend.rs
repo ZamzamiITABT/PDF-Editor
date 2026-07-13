@@ -174,6 +174,11 @@ fn desktop_java_options(log_path_option: &str) -> Vec<&str> {
         "-Dlogging.file.name=stirling-pdf.log",
         "-Dserver.port=0", // Let OS assign an available port
         "-Dserver.address=127.0.0.1",
+        "-Dui.appNameNavbar=ABT PDF Tools",
+        "-Dsystem.enableAnalytics=false",
+        "-Dsystem.enablePosthog=false",
+        "-Dsystem.enableScarf=false",
+        "-Dsystem.showUpdate=false",
         // No reverse proxy in front of the local sidecar, so don't trust forwarded headers.
         // Stops a LAN caller spoofing X-Forwarded-For to defeat the desktop-only signing gate.
         "-Dserver.forward-headers-strategy=none",
@@ -309,6 +314,15 @@ mod tests {
         let options = desktop_java_options("-Dlogging.file.path=test");
 
         assert!(options.contains(&"-Dserver.address=127.0.0.1"));
+    }
+
+    #[test]
+    fn desktop_backend_uses_abt_local_only_defaults() {
+        let options = desktop_java_options("-Dlogging.file.path=test");
+
+        assert!(options.contains(&"-Dui.appNameNavbar=ABT PDF Tools"));
+        assert!(options.contains(&"-Dsystem.enableAnalytics=false"));
+        assert!(options.contains(&"-Dsystem.showUpdate=false"));
     }
 }
 

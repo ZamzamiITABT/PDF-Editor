@@ -1,6 +1,6 @@
 use crate::utils::add_log;
 
-/// Check if Stirling PDF is the default PDF handler
+/// Check if ABT PDF Tools is the default PDF handler
 #[tauri::command]
 pub fn is_default_pdf_handler() -> Result<bool, String> {
     add_log("🔍 Checking if app is default PDF handler".to_string());
@@ -21,7 +21,7 @@ pub fn is_default_pdf_handler() -> Result<bool, String> {
     }
 }
 
-/// Attempt to set/prompt for Stirling PDF as default PDF handler
+/// Attempt to set/prompt for ABT PDF Tools as default PDF handler
 #[tauri::command]
 pub fn set_as_default_pdf_handler() -> Result<String, String> {
     add_log("⚙️ Attempting to set as default PDF handler".to_string());
@@ -89,9 +89,11 @@ fn check_default_windows() -> Result<bool, String> {
 
             add_log(format!("Windows PDF handler ProgID: {}", default_str));
 
-            // Check if it contains "Stirling" (case-insensitive)
-            // Note: This checks the ProgID registered by the installer
-            let is_default = default_str.to_lowercase().contains("stirling");
+            // Check the ProgID registered by the ABT installer.
+            let default_lower = default_str.to_lowercase();
+            let is_default = default_lower.contains("com.abtgroup.pdf-tools")
+                || default_lower.contains("abt pdf tools")
+                || default_lower.contains("abt-pdf-tools");
             Ok(is_default)
         })();
 
@@ -160,7 +162,7 @@ fn check_default_macos() -> Result<bool, String> {
         add_log(format!("macOS PDF handler: {}", handler_str));
 
         // Check if it's our bundle identifier
-        let is_default = handler_str == "stirling.pdf.dev";
+        let is_default = handler_str == "com.abtgroup.pdf-tools";
         Ok(is_default)
     }
 }
@@ -186,7 +188,7 @@ fn set_default_macos() -> Result<String, String> {
     unsafe {
         // Set our app as the default handler for PDF files
         let pdf_uti = CFString::new("com.adobe.pdf");
-        let our_bundle_id = CFString::new("stirling.pdf.dev");
+        let our_bundle_id = CFString::new("com.abtgroup.pdf-tools");
 
         let status = LSSetDefaultRoleHandlerForContentType(
             pdf_uti.as_concrete_TypeRef(),

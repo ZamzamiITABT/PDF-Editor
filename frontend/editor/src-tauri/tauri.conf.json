@@ -1,9 +1,9 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Stirling PDF",
-  "mainBinaryName": "Stirling-PDF",
-  "version": "2.14.1",
-  "identifier": "stirling.pdf.dev",
+  "productName": "ABT PDF Tools",
+  "mainBinaryName": "ABT PDF Tools",
+  "version": "1.0.0",
+  "identifier": "com.abtgroup.pdf-tools",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -13,7 +13,7 @@
   "app": {
     "windows": [
       {
-        "title": "Stirling PDF",
+        "title": "ABT PDF Tools",
         "width": 1280,
         "height": 800,
         "resizable": true,
@@ -25,18 +25,16 @@
   },
   "bundle": {
     "active": true,
-    "createUpdaterArtifacts": true,
-    "publisher": "Stirling PDF Inc.",
+    "createUpdaterArtifacts": false,
+    "publisher": "ABT Group",
     "targets": ["deb", "rpm", "appimage", "dmg", "app", "msi"],
     "icon": [
-      "icons/icon.png",
-      "icons/icon.icns",
-      "icons/icon.ico",
-      "icons/16x16.png",
-      "icons/32x32.png",
-      "icons/64x64.png",
-      "icons/128x128.png",
-      "icons/192x192.png"
+      "icons/abt-placeholder/icon.png",
+      "icons/abt-placeholder/icon.icns",
+      "icons/abt-placeholder/icon.ico",
+      "icons/abt-placeholder/32x32.png",
+      "icons/abt-placeholder/128x128.png",
+      "icons/abt-placeholder/128x128@2x.png"
     ],
     "resources": ["libs/*.jar", "runtime/jre/**/*"],
     "fileAssociations": [
@@ -63,6 +61,9 @@
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
       "timestampUrl": "http://timestamp.digicert.com",
+      "nsis": {
+        "installerIcon": "icons/abt-placeholder/icon.ico"
+      },
       "wix": {
         "upgradeCode": "3305fba9-7e5e-5c09-bc71-eca0a65f4fee",
         "bannerPath": "windows/wix/banner.bmp",
@@ -80,6 +81,10 @@
     }
   },
   "plugins": {
+    "updater": {
+      "endpoints": [],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDZEREM2QTgwNjdGNzdCOUQKUldTZGUvZG5nR3JjYmZ4TlZ3YVpHTVIzd2hBT2c4c000RDNIN2tLZENEblE4ZXFhU3J5V0lQanEK"
+    },
     "shell": {
       "open": true
     },
@@ -89,16 +94,6 @@
     "deep-link": {
       "desktop": {
         "schemes": ["stirlingpdf"]
-      }
-    },
-    "updater": {
-      "endpoints": [
-        "https://github.com/Stirling-Tools/Stirling-PDF/releases/latest/download/latest.json"
-      ],
-      "dialog": false,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDZEREM2QTgwNjdGNzdCOUQKUldTZGUvZG5nR3JjYmZ4TlZ3YVpHTVIzd2hBT2c4c000RDNIN2tLZENEblE4ZXFhU3J5V0lQanEK",
-      "windows": {
-        "installMode": "passive"
       }
     }
   }

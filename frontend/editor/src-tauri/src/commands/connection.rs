@@ -27,7 +27,7 @@ const PROVISIONING_FILE_NAME: &str = "stirling-provisioning.json";
 
 /// How the desktop auto-updater should behave on startup.
 ///
-/// * `Prompt`   – default. Show the update popup when a new version is available
+/// * `Prompt`   – show the update popup when a new version is available
 ///               and let the user decide whether to install.
 /// * `Auto`     – silently download and install updates on startup, then restart.
 ///               Intended for managed deployments (Intune/MDM) where the user
@@ -44,7 +44,7 @@ pub enum UpdateMode {
 
 impl Default for UpdateMode {
     fn default() -> Self {
-        UpdateMode::Prompt
+        UpdateMode::Disabled
     }
 }
 
@@ -385,9 +385,8 @@ pub async fn is_first_launch(app_handle: AppHandle) -> Result<bool, String> {
 
 /// Read the configured update mode from the tauri store.
 ///
-/// Returns [`UpdateMode::Prompt`] when the store is unavailable or no mode
-/// has been set — the prompt-the-user flow is the safe default for normal,
-/// non-managed installs.
+/// Returns [`UpdateMode::Disabled`] when the store is unavailable or no mode
+/// has been set. ABT deployments receive updates through managed packaging.
 pub(crate) fn read_update_mode(app_handle: &AppHandle) -> UpdateMode {
     read_update_mode_info(app_handle).mode
 }
@@ -478,6 +477,11 @@ pub async fn reset_setup_completion(app_handle: AppHandle) -> Result<(), String>
 mod tests {
     use super::*;
     use std::path::PathBuf;
+
+    #[test]
+    fn abt_build_disables_external_updates_by_default() {
+        assert_eq!(UpdateMode::default(), UpdateMode::Disabled);
+    }
 
     // Windows-path tests are cfg-gated because `Path::starts_with` is
     // component-wise: on Linux, `"C:\\foo\\bar"` is a SINGLE path component
